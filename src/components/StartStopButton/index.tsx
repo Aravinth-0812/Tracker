@@ -2,37 +2,54 @@ import { QUERY_KEY, addRecords, fetchRecords, sendMail } from "@/queries";
 import CircularButton from "../CircularButton";
 import { useQuery } from "@tanstack/react-query";
 
-function StartStopButton({ user }: { user: any }) {
-  const { data: tableRecords, isLoading } = useQuery({
+function StartStopButton({
+  user,
+  sendMessage,
+}: {
+  user: any;
+  sendMessage: any;
+}) {
+  const { data: trackList, isLoading } = useQuery({
     queryKey: [QUERY_KEY.FECTH_RECORDS],
     queryFn: fetchRecords,
   });
 
   const handleStartOnClick = async () => {
     const name = user?.attributes?.name;
-    let count = 0;
-    tableRecords.find((item: any) => {
+    let count = 1;
+    trackList.find((item: any) => {
       if (item.name === name) {
-        count = item.count;
+        count = Number(item.count) + 1;
         return true;
       }
     });
     const createRecordData = {
       name,
-      count,
+      count: count.toString(),
     };
     await addRecords(createRecordData);
-    // const emailData = {
-    //   from: "aravinth0812@gmail.com",
-    //   to: user?.attributes?.email,
-    //   subject: "Stay calm",
-    //   text: "Not even useful for 10paise",
-    // };
-    // await sendMail(emailData);
+    const emailData = {
+      from: "aravinth0812@gmail.com",
+      to: user?.attributes?.email,
+      subject: "Stay calm",
+      text: "Not even useful for 10paise",
+    };
+    await sendMail(emailData);
+    sendMessage("start");
   };
-  const handleStopOnClick = () => {};
+
+  const handleStopOnClick = async () => {
+    const emailData = {
+      from: "aravinth0812@gmail.com",
+      to: user?.attributes?.email,
+      subject: "Cheers",
+      text: "Have a drink",
+    };
+    await sendMail(emailData);
+    sendMessage("stop");
+  };
   return (
-    <div className="flex justify-around w-full py-5">
+    <div className="flex justify-around w-full py-5 flex-wrap">
       <CircularButton
         name={"Start"}
         handleOnClick={handleStartOnClick}

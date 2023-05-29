@@ -1,4 +1,4 @@
-import dynamoInstance from "@/services/dynamo";
+import dynamoInstance, { baseURL } from "@/services/dynamo";
 import axios from "axios";
 
 export const QUERY_KEY = {
@@ -6,26 +6,40 @@ export const QUERY_KEY = {
 };
 
 export const fetchRecords = async () => {
-  const { data } = await dynamoInstance(`/getTrackerRecord`);
-  return data;
+  try {
+    const { data } = await dynamoInstance(`/getTrackerRecord`);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-export const addRecords = async (data: any) => {
-  const { data: successData } = await dynamoInstance.put(
-    `/createtrackerrecord`,
-    {
-      data: { name: "check1", count: "1" },
-    }
-  );
-  return successData;
+export const addRecords = async (data: {
+  name: string;
+  count: string | number;
+}) => {
+  try {
+    await axios({
+      method: "post",
+      url: `${baseURL}/create-track-record`,
+      data: data,
+    });
+    await fetchRecords();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const sendMail = async (data: any) => {
-  const { data: successData } = await axios({
-    method: "POST",
-    url: `https://c3h6x5dao7.execute-api.eu-west-1.amazonaws.com/dev/send-email`,
-    withCredentials: false,
-    data,
-  });
-  return successData;
+  try {
+    const { data: successData } = await axios({
+      method: "POST",
+      url: `${baseURL}/send-email`,
+      withCredentials: false,
+      data,
+    });
+    return successData;
+  } catch (err) {
+    console.log(err);
+  }
 };

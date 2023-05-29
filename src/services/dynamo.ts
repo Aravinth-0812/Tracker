@@ -1,7 +1,9 @@
 import axios from "axios";
 
+export const baseURL =
+  "https://hv1a857r69.execute-api.eu-west-1.amazonaws.com/dev";
 const dynamoInstance = axios.create({
-  baseURL: "https://hv1a857r69.execute-api.eu-west-1.amazonaws.com/dev",
+  baseURL: baseURL,
   // an alternative way to cancel Axios requests using AbortController
   signal: new AbortController().signal,
 });
