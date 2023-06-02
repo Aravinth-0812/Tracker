@@ -4,7 +4,6 @@ import NoData from "../NoData";
 function Table({ tableProps, isLoading }: any) {
   const columns = tableProps?.columns;
   const rows = tableProps?.rows;
-  console.log("rows", rows);
   const renderRows = () => {
     return rows.map((item: any, index: number) => {
       const row = Object.values(item);

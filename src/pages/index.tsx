@@ -5,15 +5,23 @@ import StartStopButton from "@/components/StartStopButton";
 import Table from "@/components/Table";
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import { useQuery } from "@tanstack/react-query";
-import { QUERY_KEY, fetchRecords } from "@/queries";
-import { useCustomWebSocket } from "@/hooks/useCustomWebSocket";
+import { QUERY_KEY, fetchRecords, getStartStopTime } from "@/queries";
 
 function Home({ user }: { user: any }) {
   const { data: tableRecords, isLoading } = useQuery({
     queryKey: [QUERY_KEY.FECTH_RECORDS],
     queryFn: fetchRecords,
   });
-  const { sendMessage, data: liveData } = useCustomWebSocket();
+  const {
+    data: startStopTime,
+    isLoading: startStopLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [QUERY_KEY.FETCH_START_STOP],
+    queryFn: getStartStopTime,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
   const tableProps = useMemo(() => {
     if (tableRecords) {
       return {
@@ -39,8 +47,12 @@ function Home({ user }: { user: any }) {
         <div className="heading-x-large">
           {user?.attributes?.name ?? "Name"}
         </div>
-        <StartStopButton user={user} sendMessage={sendMessage} />
-        <Progress progressValue={liveData?.data} />
+        <StartStopButton
+          user={user}
+          refetch={refetch}
+          tableRecords={tableRecords}
+        />
+        {!startStopLoading && <Progress startStopTime={startStopTime} />}
         {isLoading ? (
           ""
         ) : (

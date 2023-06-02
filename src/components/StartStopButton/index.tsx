@@ -1,23 +1,19 @@
-import { QUERY_KEY, addRecords, fetchRecords, sendMail } from "@/queries";
+import { addRecords, sendMail, setStartDate } from "@/queries";
 import CircularButton from "../CircularButton";
-import { useQuery } from "@tanstack/react-query";
 
 function StartStopButton({
   user,
-  sendMessage,
+  refetch,
+  tableRecords,
 }: {
   user: any;
-  sendMessage: any;
+  refetch: () => void;
+  tableRecords: any;
 }) {
-  const { data: trackList, isLoading } = useQuery({
-    queryKey: [QUERY_KEY.FECTH_RECORDS],
-    queryFn: fetchRecords,
-  });
-
   const handleStartOnClick = async () => {
     const name = user?.attributes?.name;
     let count = 1;
-    trackList.find((item: any) => {
+    tableRecords.find((item: any) => {
       if (item.name === name) {
         count = Number(item.count) + 1;
         return true;
@@ -35,7 +31,8 @@ function StartStopButton({
       text: "Not even useful for 10paise",
     };
     await sendMail(emailData);
-    sendMessage("start");
+    await setStartDate(new Date().getTime());
+    await refetch();
   };
 
   const handleStopOnClick = async () => {
@@ -46,7 +43,8 @@ function StartStopButton({
       text: "Have a drink",
     };
     await sendMail(emailData);
-    sendMessage("stop");
+    await setStartDate(0);
+    await refetch();
   };
   return (
     <div className="flex justify-around w-full py-5 flex-wrap">
